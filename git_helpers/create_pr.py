@@ -74,7 +74,7 @@ if len(assignees_str) == 0:
     assignees_str = None
 
 commit_message = create_commit_message(title, source_branch_name, target_branch_name, id_str, reviewers_str, assignees_str)
-cmd = "hub pull-request -b develop -m $'" + commit_message + "'"
+cmd = "hub pull-request -b " + target_branch_name + " -m $'" + commit_message + "'"
 
 if id_str is not None:
     cmd += ' -i ' + id_str
