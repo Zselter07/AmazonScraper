@@ -1,11 +1,8 @@
 from bs4 import BeautifulSoup as bs
 
-import os, requests
+import requests
 
-def sh(command):
-    stream = os.popen(command)
-
-    return stream.read().strip('\n').strip(' ')
+from utils.sh import sh
 
 def project_name_to_id(name):
     project_id = ''
@@ -89,16 +86,8 @@ def get_issue_properties(issue_url):
 
         return None, None, None
 
-def create_commit_message(title, description, issue_url, issue_num, branch_name):
-    commit_message = '[#' + str(issue_num) + '] - ' + title + '\n'
-
-    if description is not None:
-        commit_message += '\n' + 'Description: ' + description + '\n'
-
-    commit_message += '\n' + 'Closes #' + str(issue_num)
-    commit_message += '\n' + 'Message: Created branch named \'' + branch_name + '\''
-
-    return commit_message
+def create_commit_message(issue_num, branch_name):
+    return 'Created \'' + branch_name + '\' for issue #' + str(issue_num)
 
 def push_branch(commit_message, branch_name):
     print('\n\n\n' + commit_message + '\n\n\n')
@@ -133,5 +122,5 @@ user_defined_branch_name = input('\n\nSuggested branch name\n<' + branch_name + 
 if len(user_defined_branch_name) > 0:
     branch_name = user_defined_branch_name
 
-commit_message = create_commit_message(title, description, issue_url, issue_num, branch_name)
+commit_message = create_commit_message(issue_num, branch_name)
 push_branch(commit_message, branch_name)

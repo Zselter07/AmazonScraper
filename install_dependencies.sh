@@ -1,4 +1,8 @@
 #!/bin/bash
 
-# example
-# pip3 install matplotlib
+# brew
+brew install git
+brew install hub
+
+# pip
+pip3 install bs4
