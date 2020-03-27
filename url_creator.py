@@ -1,5 +1,6 @@
-import os.path
+from os import path
 
-def url_creator(product_id):
-    url = 'https://www.amazon.com'
-    return os.path.join(url, product_id)
+AMAZON_BASE_URL = 'https://www.amazon.com/dp'
+
+def creat_product_url(product_id):
+    return path.join(AMAZON_BASE_URL, product_id)
