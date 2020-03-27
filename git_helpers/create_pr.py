@@ -69,7 +69,7 @@ reviewers_str = input('\n\nEnter name of REVIEWERS (comma separated string, no s
 if len(reviewers_str) == 0:
     reviewers_str = None
 
-assignees_str = input('\n\nEnter name of ASSIGNEES (comma separated string, no spaces), leave empty if None\nEX: \'user1,user2\'\nPress Enter to afterwards\ASSIGNEES: ')
+assignees_str = input('\n\nEnter name of ASSIGNEES (comma separated string, no spaces), leave empty if None\nEX: \'user1,user2\'\nPress Enter to afterwards\nASSIGNEES: ')
 if len(assignees_str) == 0:
     assignees_str = None
 
