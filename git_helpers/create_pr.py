@@ -9,7 +9,7 @@ def create_commit_message(title, source_branch_name, target_branch_name, id_str,
         commit_message = source_branch_name + '<-' + target_branch_name
     
     if id_str is not None:
-        commit_message = '[#' + id_str + ']' + commit_message
+        commit_message = 'ISSUE: [#' + id_str + '] - ' + commit_message
     
     commit_message += '\n'
 
