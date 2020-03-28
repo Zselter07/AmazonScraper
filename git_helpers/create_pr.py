@@ -90,4 +90,5 @@ if assignees_str is not None:
 if label is not None:
     cmd += ' -l ' + label
 
+print(cmd)
 print(sh(cmd))
