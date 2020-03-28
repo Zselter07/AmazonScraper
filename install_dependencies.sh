@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # brew
-brew install git
-brew install hub
+brew list git || brew install git
+brew list hub || brew install hub
 
 # pip
 pip3 install bs4
