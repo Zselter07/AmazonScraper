@@ -4,8 +4,8 @@ from bs4 import BeautifulSoup
 
 product_url = create_product_url('B07THHQMHM')
 r = request(product_url)
-soup = BeautifulSoup(r.content, 'html.parser')
-results = soup.find_all('span')
+soup = BeautifulSoup(r.content, 'lxml')
+# results = soup.find_all('span')
 # print(results)
 title = soup.find('span', attrs={'id':'productTitle'}).encode_contents().decode('utf-8').strip()
 print('title:', title)
