@@ -1,6 +1,8 @@
+import re, json
+
 from bs4 import BeautifulSoup
-import re
-import json
+
+from utils import utils
 
 class Parser():
 
@@ -51,6 +53,9 @@ class Parser():
             for elem in value:
                 if 'hiRes' in elem: 
                     sub_images_urls.append(elem['hiRes'])
+            
+            if len(sub_images_urls) > 0:
+                images_urls.append(sub_images_urls)
 
         for url in videos:
             if 'url' in url:
@@ -92,5 +97,18 @@ class Parser():
 
         return review_elements
 
-    
+    def parse_page(self, response):
+        asin_ids = []
+        soup = BeautifulSoup(response.content, 'lxml')
+        results = soup.find_all('span', class_="a-declarative")
+        
+        for elem in results:
+            try:
+                asin_id = utils.string_between(elem['data-a-popover'], 'asin=', '&')
 
+                if asin_id is not None:
+                    asin_ids.append(asin_id)
+            except:
+                pass
+        
+        return asin_ids
