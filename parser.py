@@ -1,4 +1,5 @@
 import re, json
+import html
 
 from bs4 import BeautifulSoup
 
@@ -21,27 +22,42 @@ class Parser():
         images = parsed_json['colorImages']
         videos = parsed_json['videos']
         
+        feature_table_first = soup.find('div', id="feature-bullets", class_ = "a-section a-spacing-medium a-spacing-top-small")
+
+        if feature_table_first is not None:
+            table_for_features = feature_table_first.find('ul', class_ = "a-unordered-list a-vertical a-spacing-none")
+
+            for li in table_for_features.find_all('li'):
+                features.append(li.get_text().strip())
+        
+        elif feature_table_first is None:
+            features = None
+
+        categ_table_first = soup.find('div', id = 'wayfinding§-breadcrumbs_container')
+
+        if categ_table_first is not None:
+            table_for_categories = categ_table_first.find('ul', class_ ='a-unordered-list a-horizontal a-size-small')
+
+            for li in table_for_categories.find_all("li"):
+                category = li.get_text().strip()
+
+            if category != '›':
+                categories.append(category)
+                
+        elif categ_table_first is None:
+            categories = None
+
         price_element = soup.find('span', id="priceblock_ourprice")
-        table_for_features = soup.find('div', id="feature-bullets", class_ = "a-section a-spacing-medium a-spacing-top-small").find('ul', class_ = "a-unordered-list a-vertical a-spacing-none")
-        table_for_categories = soup.find('div', id = 'wayfinding-breadcrumbs_container').find('ul', class_ ='a-unordered-list a-horizontal a-size-small')
 
         if price_element is not None:
             price = price_element.get_text()
 
-        for li in table_for_features.find_all('li'):
-            features.append(li.get_text().strip())
-        
-        for li in table_for_categories.find_all("li"):
-            category = li.get_text().strip()
-
-            if category != '›':
-                categories.append(category)
-
         table_for_product_info = soup.find('table', id="productDetails_detailBullets_sections1", class_="a-keyvalue prodDetTable")
 
         product_information_dict = {}
-        for tr in table_for_product_info.find_all('tr'):
-            key = tr.find('th').get_text().strip()
+        if table_for_product_info is not None:
+            for tr in table_for_product_info.find_all('tr'):
+                key = tr.find('th').get_text().strip()
 
             if key not in ['Customer Reviews', 'Best Sellers Rank']:
                 value = tr.find('td').get_text().strip()
@@ -88,7 +104,8 @@ class Parser():
                 assoc_review = elem['associatedReview']
             if 'text' in assoc_review:
                 review = assoc_review['text']
-                reviews.append(review)
+                review_beautify = html.unescape(review)
+                reviews.append(review_beautify)
         
         review_elements = {
             'images': image_urls,
@@ -97,7 +114,8 @@ class Parser():
 
         return review_elements
 
-    def parse_page(self, response):
+    def parse_page(self, response):   
+        # response = 'https://www.amazon.com/gp/customer-reviews/aj/private/reviewsGallery/            get-data-for-reviews-image-gallery-for-asin?asin='
         asin_ids = []
         soup = BeautifulSoup(response.content, 'lxml')
         results = soup.find_all('span', class_="a-declarative")
