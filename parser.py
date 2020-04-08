@@ -10,7 +10,6 @@ class Parser():
     def parse_product(self, response):
         categories = []
         features = []
-        images_urls = []
         video_urls = []
         price = None 
         
@@ -19,7 +18,7 @@ class Parser():
         parsed_json = json.loads(json_data)
 
         title = parsed_json['title']
-        images = parsed_json['colorImages']
+        images = parsed_json
         videos = parsed_json['videos']
         
         feature_table_first = soup.find('div', id="feature-bullets", class_ = "a-section a-spacing-medium a-spacing-top-small")
@@ -63,19 +62,28 @@ class Parser():
                 value = tr.find('td').get_text().strip()
                 product_information_dict[key] = value
 
-        for key, value in images.items():
-            sub_images_urls = []
+        image_details = {}
 
-            for elem in value:
-                if 'hiRes' in elem: 
-                    sub_images_urls.append(elem['hiRes'])
-            
-            if len(sub_images_urls) > 0:
-                images_urls.append(sub_images_urls)
+        if 'colorToAsin' in images and images['colorToAsin'] is not None:
+            colors = images['colorToAsin']
 
-        for url in videos:
-            if 'url' in url:
-                video_urls.append(url['url'])
+            for color_name, color_dict in colors.items():
+                # images_urls = []
+                asin = color_dict['asin']
+                image_details[asin] = {
+                    'name' : color_name,
+                    'image_urls' : []
+                }
+                
+                images_by_color = images['colorImages'][color_name]
+
+                for elem in images_by_color:
+                    if 'hiRes' in elem: 
+                        image_details[asin]['image_urls'].append(elem['hiRes'])
+
+            for url in videos:
+                if 'url' in url:
+                    video_urls.append(url['url'])
             
         product_elements = {
             'title': title, 
@@ -83,39 +91,50 @@ class Parser():
             'categories': categories,
             'features': features,
             'product information': product_information_dict,
-            'images_url': images_urls,
+            'images': image_details,
             'videos_url': video_urls
             }
 
         return product_elements
     
     def parse_reviews(self, response):
+        # response = 'https://www.amazon.com/gp/customer-reviews/aj/private/reviewsGallery/get-data-for-reviews-image-gallery-for-asin?asin='
+
         reviews_json = json.loads(response.text)
-        image_urls = []
-        reviews = []
+        reviews = {}
         images = reviews_json['images']
 
-        for image in images:
-            if 'mediumImage' in image:
-                image_urls.append(image['mediumImage'])
-
         for elem in images:
-            if 'associatedReview' in elem:
-                assoc_review = elem['associatedReview']
-            if 'text' in assoc_review:
-                review = assoc_review['text']
-                review_beautify = html.unescape(review)
-                reviews.append(review_beautify)
-        
-        review_elements = {
-            'images': image_urls,
-            'reviews': reviews
-        }
+            try:
+                author = elem['associatedReview']['author']['name']
+                text = elem['associatedReview']['text'].replace('<br />', '')
+                review_key = author + text
 
-        return review_elements
+                if review_key in reviews:
+                    review = reviews[review_key]
+                else:
+                    review = {
+                        'author':author,
+                        'text':text,
+                        'rating':elem['associatedReview']['overallRating'],
+                        'image_urls':[]
+                    }
+
+                    if 'scores' in elem['associatedReview'] and 'helpfulVotes' in elem['associatedReview']['scores']:
+                        review['upvotes'] = elem['associatedReview']['scores']['helpfulVotes']
+                    else:
+                        review['upvotes'] = 0
+                
+                img_url = elem['mediumImage']
+                review['image_urls'].append(img_url)
+
+                reviews[review_key] = review     
+            except:
+                pass
+
+        return sorted(list(reviews.values()), key=lambda k: k['upvotes'], reverse=True)
 
     def parse_page(self, response):   
-        # response = 'https://www.amazon.com/gp/customer-reviews/aj/private/reviewsGallery/            get-data-for-reviews-image-gallery-for-asin?asin='
         asin_ids = []
         soup = BeautifulSoup(response.content, 'lxml')
         results = soup.find_all('span', class_="a-declarative")
