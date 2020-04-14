@@ -11,11 +11,20 @@ class Parser():
         categories = []
         features = []
         video_urls = []
-        price = None 
+        price = None
         
         soup = BeautifulSoup(response.content, 'lxml')
-        json_data = re.search("var obj = jQuery.parseJSON\('(.*)'\);", response.text).group(1)
-        parsed_json = json.loads(json_data)
+        try:
+            json_data = re.search("var obj = jQuery.parseJSON\('(.*)'\);", response.text).group(1)
+        except Exception:
+            print(Exception)
+            return None
+
+        try:
+            parsed_json = json.loads(json_data)
+        except Exception as e:
+            print(e)
+            return None
 
         title = parsed_json['title']
         images = parsed_json
@@ -39,7 +48,7 @@ class Parser():
 
             for li in table_for_categories.find_all("li"):
                 category = li.get_text().strip()
-
+    
             if category != '›':
                 categories.append(category)
                 
@@ -99,29 +108,34 @@ class Parser():
     
     def parse_reviews(self, response):
         # response = 'https://www.amazon.com/gp/customer-reviews/aj/private/reviewsGallery/get-data-for-reviews-image-gallery-for-asin?asin='
+        try:
+            reviews_json = json.loads(response.text)        
+        except Exception as e:
+            print(e)
+            return None
+        
+        reviews = {} 
+        details = reviews_json['images']
 
-        reviews_json = json.loads(response.text)
-        reviews = {}
-        images = reviews_json['images']
-
-        for elem in images:
+        for elem in details:
             try:
                 author = elem['associatedReview']['author']['name']
-                text = elem['associatedReview']['text'].replace('<br />', '')
-                review_key = author + text
+                text = elem['associatedReview']['text']
+                clean_text = utils.remove_html_tags(text).replace('  ', ' ')
+                review_key = author
 
                 if review_key in reviews:
                     review = reviews[review_key]
                 else:
                     review = {
                         'author':author,
-                        'text':text,
+                        'text': clean_text,
                         'rating':elem['associatedReview']['overallRating'],
                         'image_urls':[]
                     }
 
                     if 'scores' in elem['associatedReview'] and 'helpfulVotes' in elem['associatedReview']['scores']:
-                        review['upvotes'] = elem['associatedReview']['scores']['helpfulVotes']
+                        review['upvotes'] = int(elem['associatedReview']['scores']['helpfulVotes'])
                     else:
                         review['upvotes'] = 0
                 
