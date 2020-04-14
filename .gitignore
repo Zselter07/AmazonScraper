@@ -3,6 +3,9 @@ __pycache__/
 __pycache__/*
 *.py[cod]
 
+# Extra exclusions
+products/*
+
 # C extensions
 *.so
 
