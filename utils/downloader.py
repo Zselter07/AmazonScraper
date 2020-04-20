@@ -1,7 +1,7 @@
 # from request import request
 import requests
 
-class Downloader:
+class FileDownloader:
     
     def download(self, path, url):
         img_data = requests.get(url).content

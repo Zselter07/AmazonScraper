@@ -1,4 +1,4 @@
-def string_creator_from_review_texts(product_reviews, min_review_length = 50, max_review_length = 1000, max_total_text_length = 5000, min_total_text_length = 500):
+def string_from_reviews(product_reviews, min_review_length = 50, max_review_length = 1000, max_total_text_length = 5000, min_total_text_length = 500):
     import os
     import json
     from langdetect import detect
