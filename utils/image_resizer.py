@@ -22,3 +22,8 @@ def resize_image(image_file_path, target_height = 1080, target_width = 1920):
     gaussImage = full_hd_image.filter(ImageFilter.GaussianBlur(40))
     gaussImage.paste(correctly_resized_image, offset)
     gaussImage.save(image_file_path)
+
+def resize_images(folder_path):
+
+    for image in folder_path:
+        resize_image(image)

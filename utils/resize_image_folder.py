@@ -1,7 +1,8 @@
-# allowed_extensions is an array, like ['jpg', 'jpeg', 'png']
-class ImagePaths:
+class PathUtils:
 
-    def file_paths_from_folder(self, root_folder_path, allowed_extensions=['jpg', 'png'], recursive=True):
+    # allowed_extensions is an array, like ['jpg', 'jpeg', 'png']
+    @staticmethod
+    def file_paths_from_folder(root_folder_path, allowed_extensions=['jpg', 'png'], recursive=True):
         import os
 
         root_folder_path = os.path.abspath(root_folder_path)
@@ -22,5 +23,5 @@ class ImagePaths:
             
             if not recursive:
                 break
-        
+
         return file_paths

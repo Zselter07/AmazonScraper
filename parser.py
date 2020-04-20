@@ -1,5 +1,4 @@
-import re, json
-import html
+import re, json, html
 
 from bs4 import BeautifulSoup
 
@@ -148,7 +147,7 @@ class Parser():
 
         return sorted(list(reviews.values()), key=lambda k: k['upvotes'], reverse=True)
 
-    def parse_page(self, response):   
+    def parse_products_page(self, response):   
         asin_ids = []
         soup = BeautifulSoup(response.content, 'lxml')
         results = soup.find_all('span', class_="a-declarative")

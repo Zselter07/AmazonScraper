@@ -8,3 +8,5 @@ brew list hub || brew install hub
 pip3 install bs4
 pip3 install html5lib
 pip3 install lxml
+pip3 install validators
+pip3 install pillow
