@@ -162,3 +162,12 @@ class Parser():
                 pass
         
         return asin_ids
+
+    def next_products_page(self, response):
+
+        soup = BeautifulSoup(response.content, 'lxml')
+
+        next_pag = soup.find('li', class_="a-last")
+        next_page_url = next_pag.find('a', href=True)
+
+        return next_page_url['href']

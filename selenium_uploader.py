@@ -2,19 +2,19 @@ from utils.selenium_wrapper.Selenium import Selenium
 import time
 import os
 
-def selenium_uploader(video_path, video_title, video_description, video_tags):
+def upload(video_path, video_title, video_description, video_tags, host=None, port=None):
 
     user_id = 'youtube'
     yt_url = 'https://www.youtube.com'
 
-    browser = Selenium(user_id, host = '199.47.121.3', port = 24826)
+    browser = Selenium(user_id, host = host, port = port)
 
     browser.driver.get(yt_url)
     time.sleep(0.5)
     browser.load_cookies()
     time.sleep(0.5)
     browser.driver.refresh()
-    time.sleep(1)
+    time.sleep(1.5)
     print('refreshed page and logged in')
 
     camera_icon = browser.driver.find_element_by_class_name('style-scope ytd-topbar-menu-button-renderer')
@@ -86,5 +86,5 @@ def selenium_uploader(video_path, video_title, video_description, video_tags):
     publish_button_main.click()
     print('published')
 
-    time.sleep(30)
+    time.sleep(20)
     browser.driver.quit()

@@ -10,11 +10,11 @@ class Amazon:
     def __init__(self):
         self.parser = Parser()
 
-    def get_product_ids(self, url: str) -> List[str]:
+    def get_product_ids_and_next_page(self, url: str) -> (List[str], str):
         if validators.url(url):
             response = request(url)
 
-            return self.parser.parse_products_page(response)
+            return (self.parser.parse_products_page(response), self.parser.next_products_page(response))
 
         return None
 
@@ -26,3 +26,5 @@ class Amazon:
         product_reviews = self.parser.parse_reviews(response_reviews)
 
         return product_details, product_reviews
+
+        

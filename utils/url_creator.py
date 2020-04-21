@@ -8,3 +8,7 @@ class AmazonURLCreator:
     @staticmethod
     def create_product_reviews_url(asin):
         return 'https://www.amazon.com/gp/customer-reviews/aj/private/reviewsGallery/get-data-for-reviews-image-gallery-for-asin?asin=' + asin
+    
+    @staticmethod
+    def create_next_page_url(next_page):
+        return path.join('https://www.amazon.com', next_page)
