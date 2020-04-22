@@ -14,7 +14,11 @@ from selenium_affiliate_links import get_affiliate_links
 from amazon import Amazon
 from ffmpeg_tasks import create_final_video
 
-def run(url: str, host: str=None, port: int=None):
+def run(
+    url:str, 
+    host:str=None, 
+    port:int=None
+):
     video_counter = 0
     amazon = Amazon()
     create_next_url = AmazonURLCreator()
@@ -27,8 +31,8 @@ def run(url: str, host: str=None, port: int=None):
         if next_page_url is not None:
             url = next_page_url
 
-        product_ids, next_page = amazon.get_product_ids_and_next_page(url)
-        next_page_url = create_next_url.create_product_url(next_page)
+        product_ids, next_page_param = amazon.get_product_ids_and_next_page(url)
+        next_page_url = create_next_url.create_next_page_url(next_page_param)
 
         ignored_ids_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'ignored_asins.json')
 
@@ -89,10 +93,11 @@ def run(url: str, host: str=None, port: int=None):
                         print('Scraped amazon affiliate link')
 
                         youtube_video_title = product_details['title'][:90] + ' review' 
+                        title_formattted = BeautifulSoup(youtube_video_title, "lxml").text.replace('\\', '/')
                         youtube_video_description_list = product_details['features'][:4500]
                         youtube_video_description = ' '.join(youtube_video_description_list)
                         full_description = str(affiliate_link) + '\n' + youtube_video_description
-                        upload(os.path.join(product_folder_path, 'final.mp4'), youtube_video_title, full_description, "amazon reviews, reviews, honest reviews, customer reviews,", host=host, port=port)
+                        upload(os.path.join(product_folder_path, 'final.mp4'), title_formattted, full_description, "amazon reviews, reviews, honest reviews, customer reviews,", host=host, port=port)
 
                         print('Uploaded video to youtube and added all details')
                         video_counter += 1 
@@ -100,7 +105,6 @@ def run(url: str, host: str=None, port: int=None):
                         if video_counter == 45:
                             exit(0)
                             print('uploaded 45 videos')
-
 
 urls = [
     'https://www.amazon.com/s?rh=n%3A565098%2Cp_72%3A4-&pf_rd_i=565098&pf_rd_p=76e296ad-5413-5bf6-af6f-01baaf1f131b&pf_rd_r=1PKH0MDTDS851FVQ3PYC&pf_rd_s=merchandised-search-11&pf_rd_t=BROWSE&refresh=1',

@@ -10,5 +10,6 @@ class AmazonURLCreator:
         return 'https://www.amazon.com/gp/customer-reviews/aj/private/reviewsGallery/get-data-for-reviews-image-gallery-for-asin?asin=' + asin
     
     @staticmethod
-    def create_next_page_url(next_page):
-        return path.join('https://www.amazon.com', next_page)
+    def create_next_page_url(next_page_param):
+        next_page_url = 'https://www.amazon.com' + next_page_param
+        return next_page_url

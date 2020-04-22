@@ -16,7 +16,7 @@ class Amazon:
 
             return (self.parser.parse_products_page(response), self.parser.next_products_page(response))
 
-        return None
+        return None, None
 
     def get_product(self, product_id: str) -> (Dict, List):        
         response_details = request(URLCreator.create_product_url(product_id))
