@@ -1,5 +1,6 @@
-from PIL import Image
-from PIL import ImageFilter
+from PIL import Image, ImageFilter
+
+from . import paths
 
 def resize_image(image_file_path, target_height = 1080, target_width = 1920):
     image = Image.open(image_file_path, 'r')
@@ -24,6 +25,5 @@ def resize_image(image_file_path, target_height = 1080, target_width = 1920):
     gaussImage.save(image_file_path)
 
 def resize_images(folder_path):
-
-    for image in folder_path:
-        resize_image(image)
+    for image_path in paths.PathUtils().file_paths_from_folder(folder_path):
+        resize_image(image_path)

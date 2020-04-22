@@ -1,4 +1,5 @@
-import json, re, os.path, sys, threading, random
+import json, re, os.path, sys, threading, random, time
+from datetime import datetime
 
 from bs4 import BeautifulSoup
 import tkinter as tk
@@ -6,43 +7,43 @@ import tkinter as tk
 from utils.resource_downloader import ResourceDownloader
 from utils.image_resizer import resize_images
 from utils.text_to_speech import TextToSpeech
-from utils.resize_image_folder import PathUtils
 from utils.url_creator import AmazonURLCreator
 from utils import text_from_product_reviews, utils, ffmpeg
+from utils import sh
 from selenium_uploader import upload
 from selenium_affiliate_links import get_affiliate_links
 from amazon import Amazon
 from ffmpeg_tasks import create_final_video
 
 def run(
-    url:str, 
-    host:str=None, 
-    port:int=None
-):
-    video_counter = 0
+    url:str,
+    host:str = None, 
+    port:int = None,
+    max_videos:int = 45
+) -> int:
+    uploaded_videos_count = 0
     amazon = Amazon()
-    create_next_url = AmazonURLCreator()
+    url_creator = AmazonURLCreator()
     resource_downloader = ResourceDownloader()
     products_folder_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'products')
     os.makedirs(products_folder_path, exist_ok = True)
     next_page_url = None
 
+    ignored_ids_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'ignored_asins.json')
+
+    if not os.path.exists(ignored_ids_path):
+        excluded_ids = []
+        with open(ignored_ids_path, 'w') as ignored_path_not_exist:
+            json.dump(excluded_ids, ignored_path_not_exist)
+
+    with open(ignored_ids_path, 'r') as f:
+        excluded_ids = json.load(f)
+ 
     while True:
         if next_page_url is not None:
             url = next_page_url
 
         product_ids, next_page_param = amazon.get_product_ids_and_next_page(url)
-        next_page_url = create_next_url.create_next_page_url(next_page_param)
-
-        ignored_ids_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'ignored_asins.json')
-
-        if not os.path.exists(ignored_ids_path):
-            excluded_ids = []
-            with open(ignored_ids_path, 'w') as f_not_exist:
-                json.dump(excluded_ids, f_not_exist)
-
-        with open(ignored_ids_path, 'r') as f:
-            excluded_ids = json.load(f)
 
         for product_id in product_ids:
             if product_id not in excluded_ids:
@@ -55,12 +56,12 @@ def run(
                 review_text = text_from_product_reviews.string_from_reviews(product_reviews)
 
                 if review_text is not None:
-            
+                    print('Creating product_details and review_text')
+
                     product_folder_path = os.path.join(products_folder_path, product_id)
                     product_details_file_path = os.path.join(product_folder_path, 'product_details.json')
                     resources_path = os.path.join(product_folder_path, 'resources')
                     review_images_path = os.path.join(product_folder_path, 'review_images')
-                    images_paths = PathUtils.file_paths_from_folder(review_images_path)
 
                     os.makedirs(resources_path, exist_ok = True)
                     os.makedirs(review_images_path, exist_ok = True)
@@ -69,43 +70,64 @@ def run(
                         f.write(review_text)
 
                     with open(product_details_file_path, 'w') as f:
-                        json.dump((product_details, product_reviews), f, indent=4)
+                        json.dump({
+                            'product_details':product_details,
+                            'product_reviews':product_reviews
+                            }, f, indent=4)
 
-                    print('Creating product_details and review_text')
+                    print('downloading resources')
 
                     # resource_downloader.download_resources(product_details, resources_path)
                     resource_downloader.download_review_resources(product_reviews, review_images_path)
 
-                    print('downloaded resources')     
+                    print('resizing images')
 
-                    resize_images(images_paths)
+                    resize_images(review_images_path)
 
-                    print('resized images')
+                    print('Creating final video')
 
                     create_final_video(product_folder_path, review_text, review_images_path)
                     
                     if os.path.exists(os.path.join(product_folder_path, 'final.mp4')):
-
                         print('Created final video')
 
-                        affiliate_link = get_affiliate_links(product_id)
+                        try:
+                            affiliate_link = get_affiliate_links(product_id)
 
-                        print('Scraped amazon affiliate link')
+                            print('Scraped amazon affiliate link')
 
-                        youtube_video_title = product_details['title'][:90] + ' review' 
-                        title_formattted = BeautifulSoup(youtube_video_title, "lxml").text.replace('\\', '/')
-                        youtube_video_description_list = product_details['features'][:4500]
-                        youtube_video_description = ' '.join(youtube_video_description_list)
-                        full_description = str(affiliate_link) + '\n' + youtube_video_description
-                        upload(os.path.join(product_folder_path, 'final.mp4'), title_formattted, full_description, "amazon reviews, reviews, honest reviews, customer reviews,", host=host, port=port)
+                            youtube_video_title = product_details['title'][:90] + ' review' 
+                            title_formattted = BeautifulSoup(youtube_video_title, "lxml").text.replace('\\', '/')
+                            youtube_video_description_list = product_details['features'][:4500]
+                            youtube_video_description = ' '.join(youtube_video_description_list)
+                            full_description = str(affiliate_link) + '\n' + youtube_video_description
+                            upload(os.path.join(product_folder_path, 'final.mp4'), title_formattted, full_description, "amazon reviews, reviews, honest reviews, customer reviews,", host=host, port=port)
 
-                        print('Uploaded video to youtube and added all details')
-                        video_counter += 1 
+                            print('Uploaded video to youtube and added all details')
+                            
+                            uploaded_videos_count += 1
+                            if uploaded_videos_count == max_videos:
+                                return uploaded_videos_count
 
-                        if video_counter == 45:
-                            exit(0)
-                            print('uploaded 45 videos')
+                        except Exception as e:
+                            print(e)
+                            
+                    else:
+                        print('Could not create final video')
+        
+        if next_page_param == None:
+            return uploaded_videos_count
 
+        next_page_url = url_creator.create_next_page_url(next_page_param)
+
+try:
+    import shutil
+
+    shutil.rmtree(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'products'), )
+except:
+    pass
+
+MAX_VIDEOS_PER_DAY = 45
 urls = [
     'https://www.amazon.com/s?rh=n%3A565098%2Cp_72%3A4-&pf_rd_i=565098&pf_rd_p=76e296ad-5413-5bf6-af6f-01baaf1f131b&pf_rd_r=1PKH0MDTDS851FVQ3PYC&pf_rd_s=merchandised-search-11&pf_rd_t=BROWSE&refresh=1',
  
@@ -118,8 +140,47 @@ urls = [
     'https://www.amazon.com/s?rh=n%3A1292115011%2Cp_72%3A4-&pf_rd_i=1292115011&pf_rd_p=cdc23760-bcad-51dd-89a5-59f1c87ba3c4&pf_rd_r=95QYANQC0QH8MQA9ZNDM&pf_rd_s=merchandised-search-11&pf_rd_t=BROWSE&ref=Oct_s9_apbd_otopr_hd_bw_b1PRa8h_S'
 ]
 
+videos_counter_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'videos_counter.json')
+
+try:
+    with open(videos_counter_path, 'r') as f:
+        number_of_videos_by_day = json.load(f)
+except:
+    number_of_videos_by_day = {
+        'day':-1,
+        'number_of_videos': 0
+    }
+
 while True:
-    run(random.choice(urls), host='199.47.121.3', port=24826)
+    today = datetime.today().day
+
+    if number_of_videos_by_day['day'] != today:
+        number_of_videos_by_day['number_of_videos'] = 0
+
+        with open(videos_counter_path, 'w') as f:
+            json.dump(number_of_videos_by_day, f, indent=4)
+    
+    if number_of_videos_by_day['number_of_videos'] < MAX_VIDEOS_PER_DAY:
+        uploaded_videos_count = run(
+            random.choice(urls), 
+            host='199.47.121.3', 
+            port=24826,
+            max_videos=MAX_VIDEOS_PER_DAY-number_of_videos_by_day['number_of_videos']
+        )
+
+        number_of_videos_by_day['number_of_videos'] += uploaded_videos_count
+
+        with open(videos_counter_path, 'w') as f:
+            json.dump(number_of_videos_by_day, f, indent=4)
+    
+    time.sleep(5)
+
+
+    
+
+    
+    
+ 
 
 
 
@@ -152,3 +213,22 @@ while True:
 
 # master.mainloop()
 
+
+
+
+
+# def login(id, url, host, port):
+#     from utils.selenium_wrapper.Selenium import Selenium
+
+#     browser = Selenium(id, host = host, port = port)
+#     browser.driver.get(url)
+#     input('log in and enter: ')
+#     browser.driver.get(url)
+#     time.sleep(1)
+#     browser.save_cookies()
+#     time.sleep(2)
+#     browser.driver.quit()
+
+# login('youtube', 'https://www.youtube.com/', '199.47.121.3', 24826)
+# login('amazon', 'https://affiliate-program.amazon.com/', None, None)
+# exit(0)

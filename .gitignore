@@ -8,6 +8,7 @@ products/*
 **/cookies/*
 **/extensions/*
 ignored_asins.json
+videos_counter.json
 
 # C extensions
 *.so

@@ -3,7 +3,6 @@ import time
 import os
 
 def get_affiliate_links(asin):
-
     user_id = 'amazon'
     amazon_url = 'https://affiliate-program.amazon.com/'
 

@@ -14,15 +14,10 @@ class Parser():
         
         soup = BeautifulSoup(response.content, 'lxml')
         try:
-            json_data = re.search("var obj = jQuery.parseJSON\('(.*)'\);", response.text).group(1)
-        except Exception:
-            print(Exception)
-            return None
-
-        try:
-            parsed_json = json.loads(json_data)
+            parsed_json = json.loads(response.text.split('var obj = jQuery.parseJSON(\'')[1].split('\')')[0].replace('\\\'', '\''))
         except Exception as e:
             print(e)
+            
             return None
 
         title = parsed_json['title']

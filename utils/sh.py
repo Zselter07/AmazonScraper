@@ -1,6 +1,6 @@
 def path(path):
-    # return path.replace(' ', '\\ ')
-    return '\'' + path + '\''
+    return path.replace(' ', '\\ ')
+    # return '\'' + path + '\''
 
 def sh(cmd):
     import subprocess

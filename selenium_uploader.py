@@ -3,7 +3,6 @@ import time
 import os
 
 def upload(video_path, video_title, video_description, video_tags, host=None, port=None):
-
     user_id = 'youtube'
     yt_url = 'https://www.youtube.com'
 
