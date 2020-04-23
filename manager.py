@@ -155,10 +155,11 @@ while True:
     today = datetime.today().day
 
     if number_of_videos_by_day['day'] != today:
-        number_of_videos_by_day['number_of_videos'] = 0
+        number_of_videos_by_day['number_of_videos'] = 0 
+        number_of_videos_by_day['day'] = today
 
         with open(videos_counter_path, 'w') as f:
-            json.dump(number_of_videos_by_day, f, indent=4)
+            json.dump(number_of_videos_by_day, f, indent=4) 
     
     if number_of_videos_by_day['number_of_videos'] < MAX_VIDEOS_PER_DAY:
         uploaded_videos_count = run(
@@ -173,19 +174,8 @@ while True:
         with open(videos_counter_path, 'w') as f:
             json.dump(number_of_videos_by_day, f, indent=4)
     
-    time.sleep(5)
-
-
-    
-
-    
-    
- 
-
-
-
-
-
+    print('uploaded maximum amount for today')
+    time.sleep(15)
 
 
 
