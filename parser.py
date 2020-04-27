@@ -87,6 +87,18 @@ class Parser():
             for url in videos:
                 if 'url' in url:
                     video_urls.append(url['url'])
+
+            associated_asins = []
+
+            try:
+                associated_asins_string = response.text.split('dimensionToAsinMap" : ')[1].split('},')[0]
+                associated_asins_json = json.loads(associated_asins_string + '}')
+
+                for val in associated_asins_json.values():
+                    associated_asins.append(val)
+
+            except Exception as e:
+                print(e)
             
         product_elements = {
             'title': title, 
@@ -95,7 +107,8 @@ class Parser():
             'features': features,
             'product information': product_information_dict,
             'images': image_details,
-            'videos_url': video_urls
+            'videos_url': video_urls,
+            'associated_asins': associated_asins
             }
 
         return product_elements

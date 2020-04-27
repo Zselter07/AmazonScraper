@@ -48,14 +48,26 @@ def run(
         for product_id in product_ids:
             if product_id not in excluded_ids:
 
+                product_details, product_reviews = amazon.get_product(product_id)
+
+                for associated_asin in product_details['associated_asins']:
+                    excluded_ids.append(associated_asin)
                 excluded_ids.append(product_id)
+
                 with open(ignored_ids_path, 'w') as f_out:
                     json.dump(excluded_ids, f_out)
+                
+                min_review_len_minutes = 1
+                max_review_len_minutes = 5
+                words_per_minute = 130
+                
+                review_text = text_from_product_reviews.string_from_reviews(
+                    product_reviews,
+                    min_total_text_length=min_review_len_minutes * words_per_minute,
+                    max_total_text_length=max_review_len_minutes * words_per_minute
+                )
 
-                product_details, product_reviews = amazon.get_product(product_id)
-                review_text = text_from_product_reviews.string_from_reviews(product_reviews)
-
-                if review_text is not None:
+                if review_text is not None and product_details is not None:
                     print('Creating product_details and review_text')
 
                     product_folder_path = os.path.join(products_folder_path, product_id)
@@ -100,18 +112,18 @@ def run(
                             title_formattted = BeautifulSoup(youtube_video_title, "lxml").text.replace('\\', '/')
                             youtube_video_description_list = product_details['features'][:4500]
                             youtube_video_description = ' '.join(youtube_video_description_list)
-                            full_description = str(affiliate_link) + '\n' + youtube_video_description
+                            full_description = 'BUY IT ON SALE ➡️  ' + str(affiliate_link) + '\n\n\n' + youtube_video_description
                             upload(os.path.join(product_folder_path, 'final.mp4'), title_formattted, full_description, "amazon reviews, reviews, honest reviews, customer reviews,", host=host, port=port)
 
                             print('Uploaded video to youtube and added all details')
                             
                             uploaded_videos_count += 1
+
                             if uploaded_videos_count == max_videos:
                                 return uploaded_videos_count
 
                         except Exception as e:
                             print(e)
-                            
                     else:
                         print('Could not create final video')
         

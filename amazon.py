@@ -20,10 +20,18 @@ class Amazon:
 
     def get_product(self, product_id: str) -> (Dict, List):        
         response_details = request(URLCreator.create_product_url(product_id))
-        product_details = self.parser.parse_product(response_details)
+        try:
+            product_details = self.parser.parse_product(response_details)
+        except Exception as e:
+            print(e)
+            product_details = None
 
         response_reviews = request(URLCreator.create_product_reviews_url(product_id))
-        product_reviews = self.parser.parse_reviews(response_reviews)
+        try:
+            product_reviews = self.parser.parse_reviews(response_reviews)
+        except Exception as e:
+            print(e)
+            product_reviews = None
 
         return product_details, product_reviews
 

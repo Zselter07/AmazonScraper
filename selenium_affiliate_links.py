@@ -9,7 +9,7 @@ def get_affiliate_links(asin):
     browser = Selenium(user_id)
 
     browser.driver.get(amazon_url)
-    time.sleep(1)
+    time.sleep(2)
 
     browser.load_cookies()
     time.sleep(1.5)
@@ -40,4 +40,17 @@ def get_affiliate_links(asin):
     browser.driver.quit()
 
     return affiliate_link
+
+def login(id, url, host=None, port=None):
+    from utils.selenium_wrapper.Selenium import Selenium
+
+    browser = Selenium(id, host = host, port = port)
+    browser.driver.get(url)
+    input('log in and enter: ')
+    browser.driver.get(url)
+    time.sleep(1)
+    browser.save_cookies()
+    time.sleep(2)
+    browser.driver.quit()
+
 

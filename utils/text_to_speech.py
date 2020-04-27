@@ -1,5 +1,10 @@
 class TextToSpeech:
-    def text_to_audio(self, text, audio_path):
+    def text_to_audio(
+        self,
+        text: str,
+        audio_path: str,
+        speech_rate: int = 130 # words/minute
+    ):
         import os
         import pyttsx3
         from . import ffmpeg
@@ -16,7 +21,8 @@ class TextToSpeech:
 
         engine = pyttsx3.init()
         engine.setProperty('voice', 'com.apple.speech.synthesis.voice.daniel.premium')
-        engine.save_to_file(text=text,filename=temp_path)
+        engine.setProperty('rate', speech_rate)
+        engine.save_to_file(text=text, filename=temp_path)
         engine.runAndWait() 
 
         ffmpeg.reencode_mp3(temp_path, audio_path)
