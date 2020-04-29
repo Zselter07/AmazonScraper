@@ -29,12 +29,12 @@ def upload(video_path, video_title, video_description, video_tags, host=None, po
     browser.driver.get(yt_upload)
     print('refreshed page and logged in')
 
-    browser.find(By.XPATH, "//input[@type='file']").send_keys(video_path) 
+    browser.find(By.XPATH, "//input[@type='file']").send_keys(video_path)
     print('uploaded video')
 
     title = browser.find(By.ID, 'textbox')
-    title.clear()
     title.click()
+    title.clear()
     title.send_keys(video_title)
     print('added title')
 

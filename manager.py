@@ -49,9 +49,11 @@ def run(
             if product_id not in excluded_ids:
 
                 product_details, product_reviews = amazon.get_product(product_id)
-
-                for associated_asin in product_details['associated_asins']:
-                    excluded_ids.append(associated_asin)
+                
+                if 'associated_asins' in product_details and product_details['associated_asins'] is not None:
+                    for associated_asin in product_details['associated_asins']:
+                        excluded_ids.append(associated_asin)
+                        
                 excluded_ids.append(product_id)
 
                 with open(ignored_ids_path, 'w') as f_out:
