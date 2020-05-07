@@ -23,6 +23,7 @@ def upload(video_path, video_title, video_description, video_tags, host=None, po
     buttons_container = browser.find(By.ID, 'buttons')
     browser.find(By.CLASS_NAME, 'style-scope yt-icon-button', element=buttons_container).click()
     print('clicked camera icon')
+    time.sleep(2)
     browser.save_cookies()
     time.sleep(2)
 
@@ -90,7 +91,7 @@ def upload(video_path, video_title, video_description, video_tags, host=None, po
     time.sleep(10)
     browser.driver.quit()
 
-def login(id, url, host, port):
+def login(id, url, host=None, port=None):
     browser = Selenium(id, host = host, port = port)
     browser.driver.get(url)
     input('log in and enter: ')
@@ -98,6 +99,5 @@ def login(id, url, host, port):
     time.sleep(1)
     browser.save_cookies()
     time.sleep(2)
-
 
 

@@ -143,15 +143,10 @@ except:
 
 MAX_VIDEOS_PER_DAY = 45
 urls = [
-    'https://www.amazon.com/s?rh=n%3A565098%2Cp_72%3A4-&pf_rd_i=565098&pf_rd_p=76e296ad-5413-5bf6-af6f-01baaf1f131b&pf_rd_r=1PKH0MDTDS851FVQ3PYC&pf_rd_s=merchandised-search-11&pf_rd_t=BROWSE&refresh=1',
- 
-    'https://www.amazon.com/s?bbn=493964&rh=n%3A172282%2Cn%3A%21493964%2Cn%3A281407%2Cp_n_shipping_option-bin%3A3242350011&dc&fst=as%3Aoff&pf_rd_i=16225009011&pf_rd_m=ATVPDKIKX0DER&pf_rd_p=82d03e2f-30e3-48bf-a811-d3d2a6628949&pf_rd_r=3BN31PSJ01Y9S1FK3HZA&pf_rd_s=merchandised-search-4&pf_rd_t=101&qid=1486423355&rnid=493964&ref=s9_acss_bw_cts_AEElectr_T1_w', 
-
-    'https://www.amazon.com/s?bbn=493964&rh=n%3A172282%2Cn%3A%21493964%2Cn%3A502394%2Cp_n_shipping_option-bin%3A3242350011&dc&fst=as%3Aoff&pf_rd_i=16225009011&pf_rd_m=ATVPDKIKX0DER&pf_rd_p=82d03e2f-30e3-48bf-a811-d3d2a6628949&pf_rd_r=3BN31PSJ01Y9S1FK3HZA&pf_rd_s=merchandised-search-4&pf_rd_t=101&qid=1486423355&qid=1486423355&rnid=493964&rnid=493964%2Fs%2Fref%3Dsr_nr_n_1%3Ffst%3Das%3Aoff&ref=s9_acss_bw_cts_AEElectr_T2_w',
-    
     'https://www.amazon.com/s?rh=n%3A1232597011%2Cp_72%3A4-&pf_rd_i=1232597011&pf_rd_p=c7366b1b-7311-5285-9ba2-8b5be038d4b2&pf_rd_r=VEZE6P873A1ZWP67JAH8&pf_rd_s=merchandised-search-11&pf_rd_t=BROWSE&ref=Oct_s9_apbd_otopr_hd_bw_b1LPqmx_S',
 
     'https://www.amazon.com/s?rh=n%3A1292115011%2Cp_72%3A4-&pf_rd_i=1292115011&pf_rd_p=cdc23760-bcad-51dd-89a5-59f1c87ba3c4&pf_rd_r=95QYANQC0QH8MQA9ZNDM&pf_rd_s=merchandised-search-11&pf_rd_t=BROWSE&ref=Oct_s9_apbd_otopr_hd_bw_b1PRa8h_S'
+
 ]
 
 videos_counter_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'videos_counter.json')
@@ -190,49 +185,3 @@ while True:
     
     print('uploaded maximum amount for today')
     time.sleep(15)
-
-
-
-## UI ### 
-
-# def get_entry():
-#     return e1.get()
-
-# def run_background():
-#     e1 = get_entry()
-#     t = threading.Thread(target=lambda: run(e1))
-#     t.daemon = True
-#     t.start()
-
-# def stop():
-#     master.destroy()
-
-
-# master = tk.Tk()
-# e1 = tk.Entry(master)
-# e1.grid(row=0, column=1)
-# tk.Label(master, text = "Enter URL").grid(row = 0, column = 0)
-# tk.Button(master, text = 'Run', command = lambda: run_background()).grid(row = 1, column = 0, columnspan = 2)
-# tk.Button(master, text = 'Quit', command = stop).grid(row = 2, column = 0)
-
-# master.mainloop()
-
-
-
-
-
-# def login(id, url, host, port):
-#     from utils.selenium_wrapper.Selenium import Selenium
-
-#     browser = Selenium(id, host = host, port = port)
-#     browser.driver.get(url)
-#     input('log in and enter: ')
-#     browser.driver.get(url)
-#     time.sleep(1)
-#     browser.save_cookies()
-#     time.sleep(2)
-#     browser.driver.quit()
-
-# login('youtube', 'https://www.youtube.com/', '199.47.121.3', 24826)
-# login('amazon', 'https://affiliate-program.amazon.com/', None, None)
-# exit(0)
